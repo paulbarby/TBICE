@@ -28,3 +28,8 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Temporary and test directories
+tmp/
+temp/
+test_output/

@@ -118,8 +118,42 @@ class ImageProcessor:
                 # For ICO format, we need to ensure it's in RGBA mode
                 if img.mode != 'RGBA':
                     img = img.convert('RGBA')
-                # ICO format supports multiple sizes, but we'll just use one
-                img.save(dest_path, format='ICO', sizes=[(img.width, img.height)])
+                
+                # Ensure image size is appropriate for ICO format
+                # ICO works best with standard sizes: 16x16, 32x32, 48x48, 64x64, 128x128
+                # Resize to closest standard size if needed
+                width, height = img.size
+                ico_sizes = [16, 32, 48, 64, 128, 256]
+                
+                # Find closest standard size
+                closest_size = min(ico_sizes, key=lambda x: abs(x - max(width, height)))
+                
+                # Resize if needed to maintain aspect ratio
+                if width != closest_size or height != closest_size:
+                    # Calculate new dimensions while preserving aspect ratio
+                    if width > height:
+                        new_width = closest_size
+                        new_height = int(height * closest_size / width)
+                    else:
+                        new_height = closest_size
+                        new_width = int(width * closest_size / height)
+                    
+                    img = img.resize((new_width, new_height), Image.LANCZOS)
+                
+                # Try different approaches to save as ICO
+                try:
+                    # Approach 1: Simple save
+                    img.save(dest_path, format='ICO')
+                except Exception:
+                    try:
+                        # Approach 2: With sizes parameter
+                        img.save(dest_path, format='ICO', sizes=[(img.width, img.height)])
+                    except Exception:
+                        # Approach 3: Save as PNG then manually rename
+                        png_path = dest_path.replace('.ico', '.png')
+                        img.save(png_path, format='PNG')
+                        if os.path.exists(png_path):
+                            os.rename(png_path, dest_path)
             else:
                 img.save(dest_path)
             
