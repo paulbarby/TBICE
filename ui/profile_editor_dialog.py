@@ -555,6 +555,8 @@ class ProfileEditorDialog(QDialog):
             settings_data = {
                 'resize_width': current_data['resize_width'],
                 'resize_height': current_data['resize_height'],
+                'resize_method': current_data['resize_method'],
+                'keep_aspect_ratio': 1 if current_data['keep_aspect_ratio'] else 0,
                 'crop_left': current_data['crop_left'],
                 'crop_top': current_data['crop_top'],
                 'crop_right': current_data['crop_right'],
@@ -591,22 +593,30 @@ class ProfileEditorDialog(QDialog):
         # Set active status
         self.active_checkbox.setChecked(bool(self.profile['is_active']))
         
-        # Determine resize method based on stored values
-        resize_width = self.profile['resize_width']
-        resize_height = self.profile['resize_height']
-        
-        if resize_width == 0 and resize_height == 0:
-            # No resize
-            self.resize_method.setCurrentText("No Resize")
-        elif resize_width == -1:
-            # Percentage resize (stored in height field)
-            self.resize_method.setCurrentText("Percentage")
-            self.resize_percentage.setValue(resize_height)
+        # Set resize method from database if available
+        if 'resize_method' in self.profile and self.profile['resize_method']:
+            self.resize_method.setCurrentText(self.profile['resize_method'])
         else:
-            # Dimensions resize
-            self.resize_method.setCurrentText("Dimensions")
-            self.resize_width.setValue(resize_width)
-            self.resize_height.setValue(resize_height)
+            # Determine resize method based on stored values
+            resize_width = self.profile['resize_width']
+            resize_height = self.profile['resize_height']
+            
+            if resize_width == 0 and resize_height == 0:
+                # No resize
+                self.resize_method.setCurrentText("No Resize")
+            elif resize_width == -1:
+                # Percentage resize (stored in height field)
+                self.resize_method.setCurrentText("Percentage")
+                self.resize_percentage.setValue(resize_height)
+            else:
+                # Dimensions resize
+                self.resize_method.setCurrentText("Dimensions")
+                self.resize_width.setValue(resize_width)
+                self.resize_height.setValue(resize_height)
+        
+        # Set aspect ratio checkbox if available
+        if 'keep_aspect_ratio' in self.profile:
+            self.keep_aspect_ratio.setChecked(bool(self.profile['keep_aspect_ratio']))
         
         # Update the resize UI to show the correct controls
         self.update_resize_ui()

@@ -31,6 +31,8 @@ class Database:
             profile_id INTEGER,
             resize_width INTEGER,
             resize_height INTEGER,
+            resize_method TEXT DEFAULT 'Dimensions',
+            keep_aspect_ratio INTEGER DEFAULT 0,
             crop_left INTEGER,
             crop_top INTEGER,
             crop_right INTEGER,
@@ -86,7 +88,7 @@ class Database:
             # Update image settings
             self.cursor.execute('''
             UPDATE image_settings
-            SET resize_width = ?, resize_height = ?, 
+            SET resize_width = ?, resize_height = ?, resize_method = ?, keep_aspect_ratio = ?,
                 crop_left = ?, crop_top = ?, crop_right = ?, crop_bottom = ?,
                 brightness = ?, contrast = ?, sharpness = ?, saturation = ?,
                 quality = ?
@@ -94,6 +96,8 @@ class Database:
             ''', (
                 settings_data['resize_width'],
                 settings_data['resize_height'],
+                settings_data.get('resize_method', 'Dimensions'),
+                settings_data.get('keep_aspect_ratio', 0),
                 settings_data['crop_left'],
                 settings_data['crop_top'],
                 settings_data['crop_right'],
@@ -128,15 +132,17 @@ class Database:
             # Create image settings
             self.cursor.execute('''
             INSERT INTO image_settings (
-                profile_id, resize_width, resize_height, 
+                profile_id, resize_width, resize_height, resize_method, keep_aspect_ratio,
                 crop_left, crop_top, crop_right, crop_bottom,
                 brightness, contrast, sharpness, saturation, 
                 quality
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 profile_id,
                 settings_data['resize_width'],
                 settings_data['resize_height'],
+                settings_data.get('resize_method', 'Dimensions'),
+                settings_data.get('keep_aspect_ratio', 0),
                 settings_data['crop_left'],
                 settings_data['crop_top'],
                 settings_data['crop_right'],
@@ -155,7 +161,7 @@ class Database:
         self.cursor.execute('''
         SELECT p.id, p.name, p.source_folder, p.destination_folder, 
                p.output_format, p.filename_pattern, p.is_active,
-               s.resize_width, s.resize_height, 
+               s.resize_width, s.resize_height, s.resize_method, s.keep_aspect_ratio,
                s.crop_left, s.crop_top, s.crop_right, s.crop_bottom,
                s.brightness, s.contrast, s.sharpness, s.saturation, s.quality
         FROM profiles p
@@ -166,7 +172,7 @@ class Database:
         columns = [
             'id', 'name', 'source_folder', 'destination_folder', 
             'output_format', 'filename_pattern', 'is_active',
-            'resize_width', 'resize_height',
+            'resize_width', 'resize_height', 'resize_method', 'keep_aspect_ratio',
             'crop_left', 'crop_top', 'crop_right', 'crop_bottom',
             'brightness', 'contrast', 'sharpness', 'saturation', 'quality'
         ]
@@ -177,7 +183,7 @@ class Database:
         self.cursor.execute('''
         SELECT p.id, p.name, p.source_folder, p.destination_folder, 
                p.output_format, p.filename_pattern, p.is_active,
-               s.resize_width, s.resize_height, 
+               s.resize_width, s.resize_height, s.resize_method, s.keep_aspect_ratio,
                s.crop_left, s.crop_top, s.crop_right, s.crop_bottom,
                s.brightness, s.contrast, s.sharpness, s.saturation, s.quality
         FROM profiles p
@@ -192,7 +198,7 @@ class Database:
         columns = [
             'id', 'name', 'source_folder', 'destination_folder', 
             'output_format', 'filename_pattern', 'is_active',
-            'resize_width', 'resize_height',
+            'resize_width', 'resize_height', 'resize_method', 'keep_aspect_ratio',
             'crop_left', 'crop_top', 'crop_right', 'crop_bottom',
             'brightness', 'contrast', 'sharpness', 'saturation', 'quality'
         ]
