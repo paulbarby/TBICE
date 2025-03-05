@@ -437,6 +437,21 @@ class MainWindow(QMainWindow):
             <li><b>No Resize</b>: Keep original dimensions</li>
             <li>Use "Maintain Aspect Ratio" to prevent distortion</li>
         </ul>
+        
+        <p><b>Managing Processed Files:</b></p>
+        <ul>
+            <li>The application tracks which files have been processed to avoid duplicates</li>
+            <li>Each profile shows a count of processed files next to its name</li>
+            <li>To reprocess the same files again, edit the profile and click "Clear Processed Files"</li>
+            <li>Clearing processed files only removes them from the tracking database, not from the destination folder</li>
+        </ul>
+        
+        <p><b>Supported Formats:</b></p>
+        <ul>
+            <li><b>Input</b>: JPG, JPEG, PNG, GIF, BMP, WEBP, TIFF, ICO</li>
+            <li><b>Output</b>: JPG, PNG, WEBP, GIF, ICO</li>
+            <li>Quality settings affect compression levels for supported formats</li>
+        </ul>
         """
         
         help_dialog.setText(help_text)
