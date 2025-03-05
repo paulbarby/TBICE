@@ -213,16 +213,20 @@ class MainWindow(QMainWindow):
     def load_profiles(self):
         self.profiles_list.clear()
         profiles = self.db.get_profiles()
+        self.profile_widgets = {}  # Store references to profile widgets
         
         for profile in profiles:
             item = QListWidgetItem()
-            item_widget = ProfileListItem(profile)
+            item_widget = ProfileListItem(profile, self.db)
             
             item.setData(Qt.ItemDataRole.UserRole, profile['id'])
             item.setSizeHint(item_widget.sizeHint())
             
             self.profiles_list.addItem(item)
             self.profiles_list.setItemWidget(item, item_widget)
+            
+            # Store reference to widget
+            self.profile_widgets[profile['id']] = item_widget
     
     def on_profile_selected(self):
         # Enable buttons
@@ -361,6 +365,10 @@ class MainWindow(QMainWindow):
                     
                     # Update UI log
                     self.log_message(f"Saved to {dest_path}")
+                    
+                    # Update the file count display if available
+                    if profile_id in self.profile_widgets:
+                        self.profile_widgets[profile_id].update_files_count()
                 else:
                     self.log_message(f"Failed to save processed image", error=True)
             else:

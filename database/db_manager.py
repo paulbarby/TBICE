@@ -223,5 +223,30 @@ class Database:
         ''', (profile_id, source_path, destination_path, datetime.now()))
         self.conn.commit()
     
+    def get_processed_files_count(self, profile_id=None):
+        if profile_id:
+            self.cursor.execute('''
+            SELECT COUNT(*) FROM processed_files WHERE profile_id = ?
+            ''', (profile_id,))
+        else:
+            self.cursor.execute('''
+            SELECT COUNT(*) FROM processed_files
+            ''')
+        
+        return self.cursor.fetchone()[0]
+    
+    def clear_processed_files(self, profile_id=None):
+        if profile_id:
+            self.cursor.execute('''
+            DELETE FROM processed_files WHERE profile_id = ?
+            ''', (profile_id,))
+        else:
+            self.cursor.execute('''
+            DELETE FROM processed_files
+            ''')
+        
+        self.conn.commit()
+        return self.cursor.rowcount
+    
     def close(self):
         self.conn.close()

@@ -35,6 +35,10 @@ class ProfileEditorDialog(QDialog):
         
         if self.profile:
             self.load_profile_data()
+            
+            # Show processed files count if editing an existing profile
+            if self.profile_id:
+                self.update_processed_files_count()
     
     def setup_ui(self):
         main_layout = QVBoxLayout()
@@ -116,6 +120,20 @@ class ProfileEditorDialog(QDialog):
         self.active_checkbox = QCheckBox("Active (Monitor source folder)")
         active_layout.addWidget(self.active_checkbox)
         left_layout.addLayout(active_layout)
+        
+        # Processed files info and clear button
+        if self.profile_id:  # Only show for existing profiles
+            files_layout = QHBoxLayout()
+            
+            self.processed_files_label = QLabel("Processed files: 0")
+            files_layout.addWidget(self.processed_files_label)
+            
+            self.clear_files_btn = QPushButton("Clear Processed Files")
+            self.clear_files_btn.setStyleSheet("background-color: #ff9500;")  # Orange button
+            self.clear_files_btn.clicked.connect(self.clear_processed_files)
+            files_layout.addWidget(self.clear_files_btn)
+            
+            left_layout.addLayout(files_layout)
         
         # Sample image selection
         preview_layout = QHBoxLayout()
@@ -401,6 +419,41 @@ class ProfileEditorDialog(QDialog):
                 self.processed_preview.setPixmap(pixmap)
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to update preview: {e}")
+    
+    def update_processed_files_count(self):
+        if hasattr(self, 'processed_files_label') and self.profile_id:
+            count = self.db.get_processed_files_count(self.profile_id)
+            self.processed_files_label.setText(f"Processed files: {count}")
+            
+            # Update button state based on count
+            if hasattr(self, 'clear_files_btn'):
+                self.clear_files_btn.setEnabled(count > 0)
+    
+    def clear_processed_files(self):
+        if self.profile_id:
+            # Show confirmation dialog
+            reply = QMessageBox.question(
+                self, 
+                "Confirm Clear Files",
+                "Are you sure you want to clear all processed files history for this profile?\n\n"
+                "This will allow the same files to be processed again the next time monitoring is started.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            
+            if reply == QMessageBox.StandardButton.Yes:
+                # Clear the files
+                cleared_count = self.db.clear_processed_files(self.profile_id)
+                
+                # Update the count display
+                self.update_processed_files_count()
+                
+                # Show success message
+                QMessageBox.information(
+                    self,
+                    "Files Cleared",
+                    f"Successfully cleared {cleared_count} processed file records.\n\n"
+                    "These files will be processed again the next time monitoring starts."
+                )
     
     def get_pixmap_from_pil_image(self, pil_image):
         # Convert PIL image to QPixmap for display
