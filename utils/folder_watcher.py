@@ -1,5 +1,6 @@
 import os
 import time
+import sqlite3
 from PyQt6.QtCore import QThread, pyqtSignal
 from database.db_manager import Database
 
@@ -9,6 +10,8 @@ class FolderWatcher(QThread):
     def __init__(self, db: Database, parent=None):
         super().__init__(parent)
         self.db = db
+        self.db_path = db.db_path  # Store path to create thread-safe connection later
+        self.thread_db = None  # This will hold our thread's database connection
         self.running = False
         self.profiles = {}
         self.processed_files = set()
@@ -17,9 +20,62 @@ class FolderWatcher(QThread):
     def reload_profiles(self):
         profiles = self.db.get_profiles()
         self.profiles = {p['id']: p for p in profiles if p['is_active']}
+        
+    def create_thread_db(self):
+        """Create a thread-specific database connection"""
+        if self.thread_db is not None:
+            # Close existing connection if there is one
+            try:
+                self.thread_db.close()
+            except:
+                pass
+        
+        # Create a new connection for this thread
+        self.thread_db = sqlite3.connect(self.db_path)
+        # Enable foreign keys
+        cursor = self.thread_db.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        
+    def load_processed_files_from_main(self, processed_files_list):
+        """Load processed files from a list provided by the main thread"""
+        self.processed_files.clear()
+        for file_path in processed_files_list:
+            self.processed_files.add(file_path)
+    
+    def load_processed_files(self):
+        """Load processed files from database - ONLY CALL FROM WATCHER THREAD"""
+        # This method should only be called from the run() method
+        # or other methods running in the watcher thread
+        if not self.isRunning():
+            return  # Skip if not running in the thread
+            
+        if not self.thread_db:
+            # Create connection if it doesn't exist
+            self.create_thread_db()
+            
+        self.processed_files.clear()
+        # Get all processed files for active profiles
+        for profile_id in self.profiles.keys():
+            try:
+                cursor = self.thread_db.cursor()
+                cursor.execute('''
+                SELECT source_path FROM processed_files WHERE profile_id = ?
+                ''', (profile_id,))
+                
+                files = [row[0] for row in cursor.fetchall()]
+                for file_path in files:
+                    self.processed_files.add(file_path)
+            except sqlite3.Error as e:
+                print(f"SQLite error in load_processed_files: {e}")
     
     def run(self):
         self.running = True
+        
+        # Create a thread-specific database connection
+        self.create_thread_db()
+        
+        # Load processed files from database when starting
+        self.load_processed_files()
         
         while self.running:
             for profile_id, profile in self.profiles.items():
@@ -59,3 +115,11 @@ class FolderWatcher(QThread):
     
     def stop(self):
         self.running = False
+        
+        # Close the thread-specific database connection
+        if self.thread_db:
+            try:
+                self.thread_db.close()
+                self.thread_db = None
+            except:
+                pass

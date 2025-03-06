@@ -2,6 +2,9 @@ import os
 from datetime import datetime
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QIcon, QPixmap
+
+# Application version
+APP_VERSION = "1.0.0"
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
     QPushButton, QLabel, QListWidget, QListWidgetItem, QMessageBox,
@@ -25,7 +28,7 @@ class MainWindow(QMainWindow):
         
         self.is_monitoring = False
         
-        self.setWindowTitle("Image Converter")
+        self.setWindowTitle(f"Image Converter v{APP_VERSION}")
         self.setMinimumSize(1000, 700)
         
         # Set application icon
@@ -143,6 +146,9 @@ class MainWindow(QMainWindow):
         
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
+        
+        # Add version to status bar
+        self.statusBar().showMessage(f"Version {APP_VERSION}")
     
     def setup_menu(self):
         menu_bar = self.menuBar()
@@ -201,8 +207,13 @@ class MainWindow(QMainWindow):
         # Create custom about dialog with icon
         about_dialog = QMessageBox(self)
         about_dialog.setWindowTitle("About Image Converter")
-        about_dialog.setText("<h3>Image Converter</h3>")
-        about_dialog.setInformativeText("A modern app to automate image conversion tasks.")
+        about_dialog.setText(f"<h3>Image Converter v{APP_VERSION}</h3>")
+        about_dialog.setInformativeText(
+            "A modern app to automate image conversion tasks.<br><br>"
+            f"<b>Version:</b> {APP_VERSION}<br>"
+            "<b>Created:</b> 2025<br>"
+            "<b>License:</b> MIT"
+        )
         about_dialog.setStandardButtons(QMessageBox.StandardButton.Ok)
         
         if icon_pixmap:
@@ -220,7 +231,10 @@ class MainWindow(QMainWindow):
             item_widget = ProfileListItem(profile, self.db)
             
             item.setData(Qt.ItemDataRole.UserRole, profile['id'])
-            item.setSizeHint(item_widget.sizeHint())
+            # Ensure item has enough height
+            size_hint = item_widget.sizeHint()
+            size_hint.setHeight(max(size_hint.height(), 30))  # Minimum height of 30 pixels
+            item.setSizeHint(size_hint)
             
             self.profiles_list.addItem(item)
             self.profiles_list.setItemWidget(item, item_widget)
@@ -241,27 +255,49 @@ class MainWindow(QMainWindow):
     
     def add_profile(self):
         dialog = ProfileEditorDialog(self.db, parent=self)
+        # Connect the profile_updated signal
+        dialog.profile_updated.connect(self.on_profile_updated)
         if dialog.exec():
             self.load_profiles()
     
     def edit_profile(self):
         selected_items = self.profiles_list.selectedItems()
         if not selected_items:
+            QMessageBox.information(self, "No Selection", "Please select a profile to edit.")
             return
             
         profile_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
         
         dialog = ProfileEditorDialog(self.db, profile_id=profile_id, parent=self)
+        # Connect the profile_updated signal
+        dialog.profile_updated.connect(self.on_profile_updated)
         if dialog.exec():
             self.load_profiles()
             
-            # Stop monitoring if it was running
+            # Reload watcher profiles
+            self.watcher.reload_profiles()
+            
+            # If monitoring is active, reload processed files to keep in-memory cache in sync
             if self.is_monitoring:
+                # Get processed files from database in the main thread
+                processed_files = []
+                for profile_id in self.watcher.profiles.keys():
+                    files = self.db.get_processed_files(profile_id)
+                    processed_files.extend(files)
+                
+                # Update the watcher's cache with data from main thread
+                self.watcher.load_processed_files_from_main(processed_files)
+            
+            # Stop and restart monitoring if it was running to apply changes
+            was_monitoring = self.is_monitoring
+            if was_monitoring:
+                self.toggle_monitoring()
                 self.toggle_monitoring()
     
     def toggle_profile_status(self):
         selected_items = self.profiles_list.selectedItems()
         if not selected_items:
+            QMessageBox.information(self, "No Selection", "Please select a profile to toggle active status.")
             return
             
         profile_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
@@ -274,12 +310,24 @@ class MainWindow(QMainWindow):
         # Reload profile list
         self.load_profiles()
         
-        # Reload profiles in watcher
+        # Reload profiles in watcher and update processed files cache
         self.watcher.reload_profiles()
+        
+        # If monitoring is active, reload processed files to keep in-memory cache in sync
+        if self.is_monitoring:
+            # Get processed files from database in the main thread
+            processed_files = []
+            for profile_id in self.watcher.profiles.keys():
+                files = self.db.get_processed_files(profile_id)
+                processed_files.extend(files)
+            
+            # Update the watcher's cache with data from main thread
+            self.watcher.load_processed_files_from_main(processed_files)
     
     def delete_profile(self):
         selected_items = self.profiles_list.selectedItems()
         if not selected_items:
+            QMessageBox.information(self, "No Selection", "Please select a profile to delete.")
             return
             
         profile_id = selected_items[0].data(Qt.ItemDataRole.UserRole)
@@ -306,8 +354,19 @@ class MainWindow(QMainWindow):
             self.toggle_active_action.setEnabled(False)
             self.delete_profile_action.setEnabled(False)
             
-            # Reload profiles in watcher
+            # Reload profiles in watcher and update processed files cache
             self.watcher.reload_profiles()
+            
+            # If monitoring is active, reload processed files to keep in-memory cache in sync
+            if self.is_monitoring:
+                # Get processed files from database in the main thread
+                processed_files = []
+                for profile_id in self.watcher.profiles.keys():
+                    files = self.db.get_processed_files(profile_id)
+                    processed_files.extend(files)
+                
+                # Update the watcher's cache with data from main thread
+                self.watcher.load_processed_files_from_main(processed_files)
     
     def toggle_monitoring(self):
         if self.is_monitoring:
@@ -322,8 +381,9 @@ class MainWindow(QMainWindow):
             
             self.is_monitoring = False
         else:
-            # Start monitoring
+            # Start monitoring - reload profiles and processed files
             self.watcher.reload_profiles()
+            # This will be called in the run method
             self.watcher.start()
             
             self.start_btn.setText("Stop Monitoring")
@@ -390,6 +450,27 @@ class MainWindow(QMainWindow):
     
     def clear_log(self):
         self.log_list.clear()
+        
+    def on_profile_updated(self):
+        """Handler for when a profile is updated or its processed files are cleared"""
+        # Update the profile list items to show correct file counts
+        self.update_profile_file_counts()
+        
+        # If monitoring is active, reload the watcher's processed files cache from main thread
+        if self.is_monitoring:
+            # Get processed files from database in the main thread
+            processed_files = []
+            for profile_id in self.watcher.profiles.keys():
+                files = self.db.get_processed_files(profile_id)
+                processed_files.extend(files)
+            
+            # Update the watcher's cache with data from main thread
+            self.watcher.load_processed_files_from_main(processed_files)
+            
+    def update_profile_file_counts(self):
+        """Update all profile list items' file count displays"""
+        for profile_id, widget in self.profile_widgets.items():
+            widget.update_files_count()
     
     def show_help(self):
         help_dialog = QMessageBox(self)

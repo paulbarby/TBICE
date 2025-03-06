@@ -4,8 +4,10 @@ from typing import Dict, List, Optional, Any
 
 class Database:
     def __init__(self, db_path: str = "image_converter.db"):
+        self.db_path = db_path  # Store the database path for thread safety
         self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
+        self.cursor.execute("PRAGMA foreign_keys=ON")
         self.create_tables()
     
     def create_tables(self):
@@ -234,6 +236,19 @@ class Database:
             ''')
         
         return self.cursor.fetchone()[0]
+    
+    def get_processed_files(self, profile_id=None):
+        """Get source paths of all processed files, optionally filtered by profile_id"""
+        if profile_id:
+            self.cursor.execute('''
+            SELECT source_path FROM processed_files WHERE profile_id = ?
+            ''', (profile_id,))
+        else:
+            self.cursor.execute('''
+            SELECT source_path FROM processed_files
+            ''')
+        
+        return [row[0] for row in self.cursor.fetchall()]
     
     def clear_processed_files(self, profile_id=None):
         if profile_id:

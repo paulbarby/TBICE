@@ -10,7 +10,7 @@ class ProfileListItem(QWidget):
     
     def setup_ui(self):
         layout = QHBoxLayout()
-        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setContentsMargins(8, 4, 8, 4)
         
         # Status indicator
         self.status_indicator = QLabel()
@@ -44,7 +44,8 @@ class ProfileListItem(QWidget):
             f"Format: {self.profile['output_format']}"
         )
         self.details_label = QLabel(details)
-        self.details_label.setStyleSheet("color: #666;")
+        self.details_label.setStyleSheet("color: #666; font-size: 10px;")
+        self.details_label.setWordWrap(True)
         info_layout.addWidget(self.details_label)
         
         layout.addLayout(info_layout, 1)

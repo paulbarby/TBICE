@@ -1,5 +1,5 @@
 import os
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QImage, QPixmap, QIcon
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel, QLineEdit, 
@@ -11,6 +11,9 @@ from database.db_manager import Database
 from utils.image_processor import ImageProcessor
 
 class ProfileEditorDialog(QDialog):
+    # Signal emitted when profile is created, updated, or processed files are cleared
+    profile_updated = pyqtSignal()
+    
     def __init__(self, db: Database, profile_id=None, parent=None):
         super().__init__(parent)
         self.db = db
@@ -164,39 +167,17 @@ class ProfileEditorDialog(QDialog):
         resize_group_layout.addLayout(resize_method_layout)
         
         # Stacked layouts for different resize methods
-        # 1. Dimensions resize
+        # Initialize empty layouts that will be populated dynamically
         self.dimensions_layout = QHBoxLayout()
-        self.dimensions_layout.addWidget(QLabel("Width:"))
-        self.resize_width = QSpinBox()
-        self.resize_width.setMinimum(0)
-        self.resize_width.setMaximum(10000)
-        self.resize_width.setSpecialValueText("Original")
-        self.dimensions_layout.addWidget(self.resize_width)
-        self.dimensions_layout.addWidget(QLabel("×"))
-        self.resize_height = QSpinBox()
-        self.resize_height.setMinimum(0)
-        self.resize_height.setMaximum(10000)
-        self.resize_height.setSpecialValueText("Original")
-        self.dimensions_layout.addWidget(self.resize_height)
-        
-        # Keep aspect ratio checkbox for dimensions
-        self.keep_aspect_ratio = QCheckBox("Maintain Aspect Ratio")
-        self.keep_aspect_ratio.setChecked(True)
-        self.keep_aspect_ratio.stateChanged.connect(self.on_aspect_ratio_changed)
-        self.dimensions_layout.addWidget(self.keep_aspect_ratio)
-        
-        # 2. Percentage resize
         self.percentage_layout = QHBoxLayout()
-        self.percentage_layout.addWidget(QLabel("Scale:"))
-        self.resize_percentage = QSpinBox()
-        self.resize_percentage.setMinimum(1)
-        self.resize_percentage.setMaximum(500)
-        self.resize_percentage.setValue(100)
-        self.resize_percentage.setSuffix("%")
-        self.percentage_layout.addWidget(self.resize_percentage)
+        
+        # Create initial layouts
+        self.dimensions_layout = self.create_dimensions_layout()
+        self.percentage_layout = self.create_percentage_layout()
         
         # Container for the active resize method
         self.resize_method_container = QVBoxLayout()
+        # Default to dimensions layout
         self.resize_method_container.addLayout(self.dimensions_layout)
         
         resize_group_layout.addLayout(self.resize_method_container)
@@ -447,6 +428,9 @@ class ProfileEditorDialog(QDialog):
                 # Update the count display
                 self.update_processed_files_count()
                 
+                # Send signal that processed files were cleared
+                self.profile_updated.emit()
+                
                 # Show success message
                 QMessageBox.information(
                     self,
@@ -483,22 +467,86 @@ class ProfileEditorDialog(QDialog):
         pixmap = QPixmap.fromImage(qim)
         return pixmap
     
-    def update_resize_ui(self):
-        # Clear current layout
-        while self.resize_method_container.count():
-            item = self.resize_method_container.takeAt(0)
-            if item.layout():
+    def clear_layout(self, layout):
+        """Recursively remove all items from a layout"""
+        if layout is None:
+            return
+            
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            
+            if widget is not None:
+                widget.setParent(None)
+            elif item.layout() is not None:
+                self.clear_layout(item.layout())
                 item.layout().setParent(None)
+    
+    def update_resize_ui(self):
+        # Clear resize container properly, which will remove all child layouts and widgets
+        self.clear_layout(self.resize_method_container)
         
+        # Create fresh layouts every time
+        self.dimensions_layout = self.create_dimensions_layout()
+        self.percentage_layout = self.create_percentage_layout()
+        
+        # Add the appropriate layout based on selected method
         resize_method = self.resize_method.currentText()
-        
         if resize_method == "Dimensions":
             self.resize_method_container.addLayout(self.dimensions_layout)
         elif resize_method == "Percentage":
             self.resize_method_container.addLayout(self.percentage_layout)
         # No resize doesn't need a UI
         
+        # Update the preview
         self.update_preview()
+        
+    def create_dimensions_layout(self):
+        """Create and return a fresh dimensions layout"""
+        layout = QHBoxLayout()
+        layout.addWidget(QLabel("Width:"))
+        
+        self.resize_width = QSpinBox()
+        self.resize_width.setMinimum(0)
+        self.resize_width.setMaximum(10000)
+        self.resize_width.setSpecialValueText("Original")
+        self.resize_width.valueChanged.connect(self.update_preview)
+        layout.addWidget(self.resize_width)
+        
+        layout.addWidget(QLabel("×"))
+        
+        self.resize_height = QSpinBox()
+        self.resize_height.setMinimum(0)
+        self.resize_height.setMaximum(10000)
+        self.resize_height.setSpecialValueText("Original")
+        self.resize_height.valueChanged.connect(self.update_preview)
+        layout.addWidget(self.resize_height)
+        
+        # Keep aspect ratio checkbox
+        self.keep_aspect_ratio = QCheckBox("Maintain Aspect Ratio")
+        self.keep_aspect_ratio.setChecked(True)
+        self.keep_aspect_ratio.stateChanged.connect(self.on_aspect_ratio_changed)
+        layout.addWidget(self.keep_aspect_ratio)
+        
+        return layout
+        
+    def create_percentage_layout(self):
+        """Create and return a fresh percentage layout"""
+        layout = QHBoxLayout()
+        layout.addWidget(QLabel("Scale:"))
+        
+        self.resize_percentage = QSpinBox()
+        self.resize_percentage.setMinimum(1)
+        self.resize_percentage.setMaximum(500)
+        self.resize_percentage.setValue(100)
+        self.resize_percentage.setSuffix("%")
+        self.resize_percentage.valueChanged.connect(self.update_preview)
+        layout.addWidget(self.resize_percentage)
+        
+        # Add spacer to balance the layout
+        layout.addStretch(1)
+        
+        return layout
     
     def on_aspect_ratio_changed(self, state):
         if self.preview_source_image and state == Qt.CheckState.Checked.value:
@@ -624,6 +672,9 @@ class ProfileEditorDialog(QDialog):
             # Save to database
             self.db.save_profile(profile_data, settings_data)
             
+            # Emit signal that profile was updated
+            self.profile_updated.emit()
+            
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save profile: {e}")
@@ -646,33 +697,33 @@ class ProfileEditorDialog(QDialog):
         # Set active status
         self.active_checkbox.setChecked(bool(self.profile['is_active']))
         
-        # Set resize method from database if available
-        if 'resize_method' in self.profile and self.profile['resize_method']:
-            self.resize_method.setCurrentText(self.profile['resize_method'])
-        else:
-            # Determine resize method based on stored values
-            resize_width = self.profile['resize_width']
-            resize_height = self.profile['resize_height']
-            
-            if resize_width == 0 and resize_height == 0:
-                # No resize
-                self.resize_method.setCurrentText("No Resize")
-            elif resize_width == -1:
-                # Percentage resize (stored in height field)
-                self.resize_method.setCurrentText("Percentage")
-                self.resize_percentage.setValue(resize_height)
+        # Store profile values to be applied after UI is updated
+        self.stored_resize_method = self.profile.get('resize_method', None)
+        self.stored_resize_width = self.profile.get('resize_width', 0)
+        self.stored_resize_height = self.profile.get('resize_height', 0)
+        self.stored_keep_aspect_ratio = bool(self.profile.get('keep_aspect_ratio', True))
+        
+        # Determine resize method if not explicitly stored
+        if not self.stored_resize_method:
+            if self.stored_resize_width == 0 and self.stored_resize_height == 0:
+                self.stored_resize_method = "No Resize"
+            elif self.stored_resize_width == -1:
+                self.stored_resize_method = "Percentage"
             else:
-                # Dimensions resize
-                self.resize_method.setCurrentText("Dimensions")
-                self.resize_width.setValue(resize_width)
-                self.resize_height.setValue(resize_height)
+                self.stored_resize_method = "Dimensions"
         
-        # Set aspect ratio checkbox if available
-        if 'keep_aspect_ratio' in self.profile:
-            self.keep_aspect_ratio.setChecked(bool(self.profile['keep_aspect_ratio']))
-        
-        # Update the resize UI to show the correct controls
+        # Set resize method and update UI
+        self.resize_method.setCurrentText(self.stored_resize_method)
+        # This will create fresh UI elements
         self.update_resize_ui()
+        
+        # Now apply the stored values to the newly created widgets
+        if self.stored_resize_method == "Dimensions":
+            self.resize_width.setValue(self.stored_resize_width if self.stored_resize_width > 0 else 0)
+            self.resize_height.setValue(self.stored_resize_height if self.stored_resize_height > 0 else 0)
+            self.keep_aspect_ratio.setChecked(self.stored_keep_aspect_ratio)
+        elif self.stored_resize_method == "Percentage" and self.stored_resize_width == -1:
+            self.resize_percentage.setValue(self.stored_resize_height)
         
         # Set crop values
         self.crop_left.setValue(self.profile['crop_left'])
