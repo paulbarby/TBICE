@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download instructions for TBICE (The Most Basic Image Converter Ever)">
+    <title>Download TBICE - The Most Basic Image Converter Ever</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/app-icon.png" alt="TBICE Logo">
+                <h1>TBICE</h1>
+            </div>
+            <div class="download-btn">
+                <a href="index.html" class="btn">Home</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="download-instructions">
+        <div class="container">
+            <h1>Download & Installation Instructions</h1>
+            
+            <div class="download-section">
+                <h2>Download TBICE</h2>
+                <p>Current Version: 1.0.0 - Released March 2025</p>
+                
+                <div class="download-options">
+                    <div class="download-option">
+                        <div class="download-icon">
+                            <i class="fab fa-windows"></i>
+                        </div>
+                        <h3>Windows</h3>
+                        <p>MD5: ccdc23ee47128e79965fe6488335f0e2</p>
+                        <a href="https://github.com/paulbarby/TBICE/releases/download/v1.0.0/TBICE.zip" class="btn">Download ZIP (64-bit)</a>
+                    </div>
+                    <div class="download-option">
+                        <div class="download-icon">
+                            <i class="fab fa-apple"></i>
+                        </div>
+                        <h3>macOS</h3>
+                        <p>Coming soon</p>
+                        <a href="https://github.com/paulbarby/TBICE/releases" class="btn">Check Releases</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h2>Verification & Installation Steps</h2>
+                
+                <div class="instruction-step">
+                    <h3>Step 1: Verify the Checksum (Optional but Recommended)</h3>
+                    <p>Verifying the checksum ensures the file hasn't been corrupted or tampered with during download.</p>
+                    
+                    <div class="tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="openTab(event, 'windows-verify')">Windows</button>
+                            <button class="tab-btn" onclick="openTab(event, 'mac-verify')">macOS/Linux</button>
+                        </div>
+                        
+                        <div id="windows-verify" class="tab-content active">
+                            <ol>
+                                <li>Open Command Prompt (search for "cmd" in the Start menu)</li>
+                                <li>Navigate to the folder containing the downloaded file using the <code>cd</code> command</li>
+                                <li>Run the following command:
+                                    <pre><code>certutil -hashfile TBICE.zip MD5</code></pre>
+                                </li>
+                                <li>Verify that the output matches: <code>ccdc23ee47128e79965fe6488335f0e2</code></li>
+                            </ol>
+                        </div>
+                        
+                        <div id="mac-verify" class="tab-content">
+                            <ol>
+                                <li>Open Terminal</li>
+                                <li>Navigate to the folder containing the downloaded file using the <code>cd</code> command</li>
+                                <li>Run the following command:
+                                    <pre><code>md5 TBICE.zip</code></pre>
+                                    Or on Linux:
+                                    <pre><code>md5sum TBICE.zip</code></pre>
+                                </li>
+                                <li>Verify that the output matches: <code>ccdc23ee47128e79965fe6488335f0e2</code></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="instruction-step">
+                    <h3>Step 2: Extract the ZIP File</h3>
+                    
+                    <div class="tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="openTab(event, 'windows-extract')">Windows</button>
+                            <button class="tab-btn" onclick="openTab(event, 'mac-extract')">macOS/Linux</button>
+                        </div>
+                        
+                        <div id="windows-extract" class="tab-content active">
+                            <ol>
+                                <li>Right-click on TBICE.zip</li>
+                                <li>Select "Extract All..."</li>
+                                <li>Choose a destination folder or keep the default</li>
+                                <li>Click "Extract"</li>
+                            </ol>
+                        </div>
+                        
+                        <div id="mac-extract" class="tab-content">
+                            <ol>
+                                <li>Double-click the TBICE.zip file</li>
+                                <li>The Archive Utility will automatically extract the contents</li>
+                                <li>Alternatively, in Terminal:
+                                    <pre><code>unzip TBICE.zip -d ~/Desktop/TBICE</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="instruction-step">
+                    <h3>Step 3: Run the Application</h3>
+                    
+                    <div class="tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="openTab(event, 'windows-run')">Windows</button>
+                            <button class="tab-btn" onclick="openTab(event, 'mac-run')">macOS</button>
+                        </div>
+                        
+                        <div id="windows-run" class="tab-content active">
+                            <ol>
+                                <li>Navigate to the extracted folder</li>
+                                <li>Double-click on TBICE.exe</li>
+                                <li>If Windows SmartScreen appears, click "More info" and then "Run anyway"</li>
+                                <li>The application will start</li>
+                            </ol>
+                            <p class="note"><strong>Note:</strong> If you get a missing DLL error, make sure you have the latest Visual C++ Redistributable installed from the <a href="https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads" target="_blank">Microsoft website</a>.</p>
+                        </div>
+                        
+                        <div id="mac-run" class="tab-content">
+                            <ol>
+                                <li>Navigate to the extracted folder</li>
+                                <li>Right-click on TBICE.app and select "Open"</li>
+                                <li>On the security warning, click "Open"</li>
+                                <li>The application will start</li>
+                            </ol>
+                            <p class="note"><strong>Note:</strong> If you get a message that the app cannot be opened because it is from an unidentified developer, go to System Preferences → Security & Privacy, and click "Open Anyway" next to the message about TBICE.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="instruction-step">
+                    <h3>Troubleshooting</h3>
+                    <ul>
+                        <li><strong>Application won't start:</strong> Ensure your system meets the minimum requirements (Windows 10/11 or macOS 12+)</li>
+                        <li><strong>Missing dependencies:</strong> Make sure you have the required libraries installed</li>
+                        <li><strong>For further help:</strong> <a href="https://github.com/paulbarby/TBICE/issues">Submit an issue on GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/app-icon.png" alt="TBICE Logo">
+                    <p>TBICE</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="download.html">Download</a></li>
+                        <li><a href="https://github.com/paulbarby/TBICE" target="_blank">GitHub</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <p>Have questions or suggestions?</p>
+                    <a href="https://github.com/paulbarby/TBICE/issues">Submit an issue on GitHub</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 The Most Basic Image Converter Ever (TBICE). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function openTab(evt, tabId) {
+            // Hide all tab content
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tab buttons
+            var tabButtons = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            // Show the selected tab and set the button as active
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
