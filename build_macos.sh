@@ -7,7 +7,8 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}===== Image Converter - macOS Build Script =====${NC}"
+echo -e "${GREEN}===== TBICE - macOS Build Script =====${NC}"
+echo -e "${GREEN}The Most Basic Image Converter Ever${NC}"
 echo
 
 # Check if running on macOS
@@ -49,16 +50,16 @@ echo -e "${GREEN}Running build script...${NC}"
 python3 build_macos.py
 
 # Check if build was successful
-if [ -d "dist/ImageConverter.app" ]; then
+if [ -d "dist/TBICE.app" ]; then
     echo
     echo -e "${GREEN}=====================================================${NC}"
     echo -e "${GREEN}Build successful!${NC}"
     echo
-    echo -e "The application has been built to: ${YELLOW}dist/ImageConverter.app${NC}"
+    echo -e "The application has been built to: ${YELLOW}dist/TBICE.app${NC}"
     
     # Check if DMG was created
-    if [ -f "dist/ImageConverter-1.0.0.dmg" ]; then
-        echo -e "DMG installer created at: ${YELLOW}dist/ImageConverter-1.0.0.dmg${NC}"
+    if [ -f "dist/TBICE-1.0.0.dmg" ]; then
+        echo -e "DMG installer created at: ${YELLOW}dist/TBICE-1.0.0.dmg${NC}"
     else
         echo -e "${YELLOW}Note: DMG installer was not created.${NC}"
         echo "You can manually create a DMG using Disk Utility."
@@ -67,7 +68,7 @@ if [ -d "dist/ImageConverter.app" ]; then
     echo
     echo -e "${GREEN}To run the application:${NC}"
     echo "1. Navigate to the dist folder"
-    echo "2. Double-click ImageConverter.app"
+    echo "2. Double-click TBICE.app"
     echo -e "${GREEN}=====================================================${NC}"
 else
     echo

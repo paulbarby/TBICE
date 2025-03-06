@@ -1,6 +1,7 @@
 @echo off
 echo ==========================================
-echo Image Converter - Windows Build Script
+echo TBICE - Windows Build Script
+echo The Most Basic Image Converter Ever
 echo ==========================================
 echo.
 
@@ -38,13 +39,13 @@ echo Building executable...
 python build_exe.py
 
 :: Check if build was successful
-if exist dist\ImageConverter.exe (
+if exist dist\TBICE.exe (
     echo.
     echo ==========================================
     echo Build successful!
     echo.
     echo The executable has been created at:
-    echo dist\ImageConverter.exe
+    echo dist\TBICE.exe
     echo ==========================================
 ) else (
     echo.

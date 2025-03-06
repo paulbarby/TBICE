@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build script for creating a Windows executable of the Image Converter application.
+Build script for creating a Windows executable of TBICE (The Most Basic Image Converter Ever).
 This script uses PyInstaller to bundle the application into a standalone .exe file.
 """
 
@@ -12,7 +12,7 @@ import platform
 from datetime import datetime
 
 # Application info
-APP_NAME = "ImageConverter"
+APP_NAME = "TBICE"
 APP_VERSION = "1.0.0"
 MAIN_SCRIPT = "main.py"  # Update this to your main script name
 

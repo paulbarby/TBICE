@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build script for creating a macOS application bundle of the Image Converter.
+Build script for creating a macOS application bundle of TBICE (The Most Basic Image Converter Ever).
 This script uses PyInstaller to bundle the application into a .app file.
 """
 
@@ -12,7 +12,7 @@ import platform
 from datetime import datetime
 
 # Application info
-APP_NAME = "ImageConverter"
+APP_NAME = "TBICE"
 APP_VERSION = "1.0.0"
 MAIN_SCRIPT = "main.py"  # Update this to your main script name
 
@@ -143,7 +143,7 @@ def create_app_bundle():
     
     # Add Info.plist settings
     cmd.extend([
-        "--osx-bundle-identifier", "com.example.imageconverter",
+        "--osx-bundle-identifier", "com.example.tbice",
     ])
     
     # Add the main script
