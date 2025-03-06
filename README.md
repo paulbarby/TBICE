@@ -1,6 +1,6 @@
 # The Most Basic Image Converter Ever (TBICE)
 
-[Website] (https://paulbarby.github.io/TBICE/index.html)
+[Website](https://paulbarby.github.io/TBICE/index.html)
 
 A modern desktop application for automatic image conversion with a clean, iOS-inspired interface.
 
