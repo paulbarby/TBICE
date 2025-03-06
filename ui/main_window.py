@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         
         self.is_monitoring = False
         
-        self.setWindowTitle(f"Image Converter v{APP_VERSION}")
+        self.setWindowTitle(f"The Most Basic Image Converter Ever v{APP_VERSION}")
         self.setMinimumSize(1000, 700)
         
         # Set application icon
@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
             title_layout.addWidget(icon_label)
         
         # App title
-        title_label = QLabel("Image Converter")
+        title_label = QLabel("TBICE")
         title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #007aff;")
         title_layout.addWidget(title_label)
         title_layout.addStretch(1)
@@ -206,8 +206,8 @@ class MainWindow(QMainWindow):
 
         # Create custom about dialog with icon
         about_dialog = QMessageBox(self)
-        about_dialog.setWindowTitle("About Image Converter")
-        about_dialog.setText(f"<h3>Image Converter v{APP_VERSION}</h3>")
+        about_dialog.setWindowTitle("About TBICE")
+        about_dialog.setText(f"<h3>The Most Basic Image Converter Ever v{APP_VERSION}</h3>")
         about_dialog.setInformativeText(
             "A modern app to automate image conversion tasks.<br><br>"
             f"<b>Version:</b> {APP_VERSION}<br>"
@@ -474,7 +474,7 @@ class MainWindow(QMainWindow):
     
     def show_help(self):
         help_dialog = QMessageBox(self)
-        help_dialog.setWindowTitle("How to Use Image Converter")
+        help_dialog.setWindowTitle("How to Use TBICE")
         help_dialog.setIcon(QMessageBox.Icon.Information)
         
         # Set icon to app icon
@@ -484,7 +484,7 @@ class MainWindow(QMainWindow):
             help_dialog.setIconPixmap(icon_pixmap)
         
         help_text = """
-        <h3>How to Use Image Converter</h3>
+        <h3>How to Use The Most Basic Image Converter Ever (TBICE)</h3>
         
         <p><b>Getting Started:</b></p>
         <ol>

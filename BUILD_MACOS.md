@@ -1,6 +1,6 @@
-# Building the Image Converter for macOS
+# Building TBICE for macOS
 
-This guide will walk you through the process of creating a macOS application bundle (.app) and optionally a disk image (.dmg) installer.
+This guide will walk you through the process of creating a macOS application bundle (.app) and optionally a disk image (.dmg) installer for The Most Basic Image Converter Ever (TBICE).
 
 ## Prerequisites
 
@@ -37,8 +37,8 @@ If you prefer to have more control over the build process, follow these steps:
 
 1. Clone or download the repository:
    ```bash
-   git clone https://github.com/your-username/image-converter.git
-   cd image-converter
+   git clone https://github.com/your-username/tbice.git
+   cd tbice
    ```
 
 2. Create and activate a virtual environment:
@@ -85,16 +85,16 @@ macOS applications use .icns format for their icons:
 
 1. Build the application using PyInstaller:
    ```bash
-   pyinstaller --name=ImageConverter \
+   pyinstaller --name=TBICE \
                --windowed \
                --onedir \
                --icon=assets/AppIcon.icns \
                --add-data="assets:assets" \
-               --osx-bundle-identifier=com.example.imageconverter \
+               --osx-bundle-identifier=com.example.tbice \
                main.py
    ```
 
-2. The application bundle will be created at `dist/ImageConverter.app`
+2. The application bundle will be created at `dist/TBICE.app`
 
 ### Step 4: Create a DMG Installer (Optional)
 
@@ -108,16 +108,16 @@ You can create a distributable disk image (.dmg) file:
 2. Create the DMG:
    ```bash
    create-dmg \
-     --volname "ImageConverter Installer" \
+     --volname "TBICE Installer" \
      --volicon "assets/AppIcon.icns" \
      --window-pos 200 100 \
      --window-size 800 400 \
      --icon-size 100 \
-     --icon "ImageConverter.app" 200 200 \
-     --hide-extension "ImageConverter.app" \
+     --icon "TBICE.app" 200 200 \
+     --hide-extension "TBICE.app" \
      --app-drop-link 600 200 \
-     "dist/ImageConverter-1.0.0.dmg" \
-     "dist/ImageConverter.app"
+     "dist/TBICE-1.0.0.dmg" \
+     "dist/TBICE.app"
    ```
 
 ## Troubleshooting
@@ -142,12 +142,12 @@ For distribution outside of development:
 
 1. Sign the application bundle with your Developer ID:
    ```bash
-   codesign --deep --force --verify --verbose --sign "Developer ID Application: Your Name (TEAMID)" "dist/ImageConverter.app"
+   codesign --deep --force --verify --verbose --sign "Developer ID Application: Your Name (TEAMID)" "dist/TBICE.app"
    ```
 
 2. Verify the signature:
    ```bash
-   codesign --verify --verbose "dist/ImageConverter.app"
+   codesign --verify --verbose "dist/TBICE.app"
    ```
 
 ### Notarization for Distribution
@@ -156,17 +156,17 @@ For distribution via the internet, you'll need to notarize your application with
 
 1. Create a ZIP archive of your app:
    ```bash
-   ditto -c -k --keepParent "dist/ImageConverter.app" "dist/ImageConverter.zip"
+   ditto -c -k --keepParent "dist/TBICE.app" "dist/TBICE.zip"
    ```
 
 2. Submit for notarization:
    ```bash
-   xcrun notarytool submit "dist/ImageConverter.zip" --apple-id "your@apple.id" --password "app-specific-password" --team-id "TEAMID" --wait
+   xcrun notarytool submit "dist/TBICE.zip" --apple-id "your@apple.id" --password "app-specific-password" --team-id "TEAMID" --wait
    ```
 
 3. Staple the notarization ticket:
    ```bash
-   xcrun stapler staple "dist/ImageConverter.app"
+   xcrun stapler staple "dist/TBICE.app"
    ```
 
 ## Need Help?

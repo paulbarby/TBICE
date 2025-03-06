@@ -1,6 +1,6 @@
-# Building the Image Converter for Windows
+# Building TBICE for Windows
 
-This guide will walk you through the process of creating an executable (.exe) file for Windows.
+This guide will walk you through the process of creating an executable (.exe) file for The Most Basic Image Converter Ever (TBICE) for Windows.
 
 ## Prerequisites
 
@@ -12,8 +12,8 @@ This guide will walk you through the process of creating an executable (.exe) fi
 
 1. Clone or download the repository:
    ```
-   git clone https://github.com/your-username/image-converter.git
-   cd image-converter
+   git clone https://github.com/your-username/tbice.git
+   cd tbice
    ```
 
 2. Create and activate a virtual environment:
@@ -49,7 +49,7 @@ If you prefer to build manually:
 
 1. Run PyInstaller with the appropriate options:
    ```
-   pyinstaller --name=ImageConverter --onefile --windowed --clean --noconfirm --icon=assets/app-icon.ico --add-data="assets;assets" main.py
+   pyinstaller --name=TBICE --onefile --windowed --clean --noconfirm --icon=assets/app-icon.ico --add-data="assets;assets" main.py
    ```
 
 2. The executable will be created in the `dist` folder.
@@ -57,7 +57,7 @@ If you prefer to build manually:
 ## Step 3: Run the Application
 
 1. Navigate to the `dist` folder
-2. Double-click `ImageConverter.exe` to launch the application
+2. Double-click `TBICE.exe` to launch the application
 
 ## Troubleshooting
 
@@ -89,7 +89,7 @@ If the application crashes immediately:
 1. Run it from the command line to see error messages:
    ```
    cd dist
-   ImageConverter.exe
+   TBICE.exe
    ```
 
 2. Check that all required files and dependencies are included in the build

@@ -1,4 +1,4 @@
-# Image Converter
+# The Most Basic Image Converter Ever (TBICE)
 
 A modern desktop application for automatic image conversion with a clean, iOS-inspired interface.
 
@@ -30,8 +30,8 @@ A modern desktop application for automatic image conversion with a clean, iOS-in
 
 1. Clone the repository
    ```
-   git clone https://github.com/your-username/image-converter.git
-   cd image-converter
+   git clone https://github.com/your-username/tbice.git
+   cd tbice
    ```
 2. Install dependencies:
    ```
@@ -45,14 +45,14 @@ A modern desktop application for automatic image conversion with a clean, iOS-in
 ### Method 2: Standalone Executables
 
 #### Windows
-1. Download the latest release from the [Releases](https://github.com/your-username/image-converter/releases) page
+1. Download the latest release from the [Releases](https://github.com/your-username/tbice/releases) page
 2. Run the installer or extract the ZIP file
-3. Launch ImageConverter.exe
+3. Launch TBICE.exe
 
 #### macOS
-1. Download the DMG file from the [Releases](https://github.com/your-username/image-converter/releases) page
+1. Download the DMG file from the [Releases](https://github.com/your-username/tbice/releases) page
 2. Open the DMG file and drag the application to your Applications folder
-3. Launch Image Converter from your Applications folder
+3. Launch TBICE from your Applications folder
 
 ## Building from Source
 
