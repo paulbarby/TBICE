@@ -2,7 +2,7 @@
 
 [Website](https://paulbarby.github.io/TBICE/index.html)
  
-A Claude 3.7 learing experiment. While I have over 25 years of experience in development, ranging from C to PHP, I have done very little Python. This was a test to see if my general knowledge was sufficient to build a functional application in a language I'm not proficient in.
+A Claude 3.7 learning experiment. While I have over 25 years of experience in development, ranging from C to PHP, I have done very little Python. This was a test to see if my general knowledge was sufficient to build a functional application in a language I'm not proficient in.
 
 It took me about 90 minutes to complete, including the website. All Git and Bash commands were handled by Claude Code. The website's main image was sourced from KLING AI. Claude was great—it even provided instructions on what images to add to the website after generating the pages.
 
