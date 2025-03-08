@@ -1,6 +1,8 @@
 # The Most Basic Image Converter Ever (TBICE)
 
 [Website](https://paulbarby.github.io/TBICE/index.html)
+ 
+A Claude 3.7 learing experiment. This was a test run of the new Claude Code from [https://www.anthropic.com/](Anthropic). While I have over 25 years of experience in development, ranging from C to PHP, I have done very little Python. This was a test to see if my general knowledge was sufficient to build a functional application in a language I'm not proficient in.
 
 A modern desktop application for automatic image conversion with a clean, iOS-inspired interface.
 
